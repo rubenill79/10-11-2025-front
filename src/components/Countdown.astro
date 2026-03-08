@@ -1,32 +1,28 @@
----
-import "../styles/global.css";
----
-
-<div class="grid auto-cols-max grid-flow-col gap-5 text-center">
-    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
-        <span class="countdown font-mono text-5xl">
-            <span id="days" style="--value:00;">00</span>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-5 text-center justify-items-center">
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col py-6 sm:p-2 w-full max-w-35 sm:max-w-none">
+        <span class="countdown font-mono text-5xl flex justify-center">
+            <span id="days" style="--value:00; --digits: 2;">00</span>
         </span>
         <span id="days-label">Días</span>
     </div>
     
-    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
-        <span class="countdown font-mono text-5xl">
-            <span id="hours" style="--value:00;">00</span>
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col py-6 sm:p-2 w-full max-w-35 sm:max-w-none">
+        <span class="countdown font-mono text-5xl flex justify-center">
+            <span id="hours" style="--value:00; --digits: 2;">00</span>
         </span>
         <span id="hours-label">Horas</span>
     </div>
 
-    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
-        <span class="countdown font-mono text-5xl">
-            <span id="minutes" style="--value:00;">00</span>
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col py-6 sm:p-2 w-full max-w-35 sm:max-w-none">
+        <span class="countdown font-mono text-5xl flex justify-center">
+            <span id="minutes" style="--value:00; --digits: 2;">00</span>
         </span>
         <span id="minutes-label">Minutos</span>
     </div>
 
-    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
-        <span class="countdown font-mono text-5xl">
-            <span id="seconds" style="--value:00;">00</span>
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col py-6 sm:p-2 w-full max-w-35 sm:max-w-none">
+        <span class="countdown font-mono text-5xl flex justify-center">
+            <span id="seconds" style="--value:00; --digits: 2;">00</span>
         </span>
         <span id="seconds-label">Segundos</span>
     </div>
@@ -78,7 +74,6 @@ import "../styles/global.css";
             const updateEl = (id: string, val: number) => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.textContent = String(val).padStart(2, "0");
                     el.style.setProperty("--value", String(val));
                 }
             };
