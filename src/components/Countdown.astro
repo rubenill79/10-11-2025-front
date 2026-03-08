@@ -2,194 +2,109 @@
 import "../styles/global.css";
 ---
 
-<div id="countdown-container">
-	<div id="countdown-display">
-        <div class="time-unit">
-			<span id="days" class="number">0</span>
-			<span id="days-label" class="label">Días</span>
-		</div>
-        <div class="separator">:</div>
-		<div class="time-unit">
-			<span id="hours" class="number">23</span>
-			<span id="hours-label" class="label">Horas</span>
-		</div>
-		<div class="separator">:</div>
-		<div class="time-unit">
-			<span id="minutes" class="number">59</span>
-			<span id="minutes-label" class="label">Minutos</span>
-		</div>
-		<div class="separator">:</div>
-		<div class="time-unit">
-			<span id="seconds" class="number">59</span>
-			<span id="seconds-label" class="label">Segundos</span>
-		</div>
-	</div>
+<div class="grid auto-cols-max grid-flow-col gap-5 text-center">
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
+        <span class="countdown font-mono text-5xl">
+            <span id="days" style="--value:00;">00</span>
+        </span>
+        <span id="days-label">Días</span>
+    </div>
+    
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
+        <span class="countdown font-mono text-5xl">
+            <span id="hours" style="--value:00;">00</span>
+        </span>
+        <span id="hours-label">Horas</span>
+    </div>
+
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
+        <span class="countdown font-mono text-5xl">
+            <span id="minutes" style="--value:00;">00</span>
+        </span>
+        <span id="minutes-label">Minutos</span>
+    </div>
+
+    <div class="bg-neutral rounded-box text-neutral-content flex flex-col p-2">
+        <span class="countdown font-mono text-5xl">
+            <span id="seconds" style="--value:00;">00</span>
+        </span>
+        <span id="seconds-label">Segundos</span>
+    </div>
 </div>
 
 <script>
-	function updateCountdown() {
-		// Obtener la hora actual en zona horaria europea (CET/CEST)
-		const europeFormatter = new Intl.DateTimeFormat('es-ES', {
-			timeZone: 'Europe/Madrid',
-			year: 'numeric',
-			month: '2-digit',
-			day: '2-digit',
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit',
-			hour12: false
-		});
+    function updateCountdown() {
+        const europeFormatter = new Intl.DateTimeFormat("es-ES", {
+            timeZone: "Europe/Madrid",
+            year: "numeric", month: "2-digit", day: "2-digit",
+            hour: "2-digit", minute: "2-digit", second: "2-digit",
+            hour12: false,
+        });
 
-		function getEuropeNow() {
-			const now = new Date();
-			const parts = europeFormatter.formatToParts(now);
-			const partsObject: Record<string, string> = {};
-			parts.forEach(part => {
-				partsObject[part.type] = part.value;
-			});
+        function getEuropeNow() {
+            const now = new Date();
+            const parts = europeFormatter.formatToParts(now);
+            const p: any = {};
+            parts.forEach(part => p[part.type] = part.value);
+            return new Date(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+        }
 
-			return new Date(
-				parseInt(partsObject.year),
-				parseInt(partsObject.month) - 1,
-				parseInt(partsObject.day),
-				parseInt(partsObject.hour),
-				parseInt(partsObject.minute),
-				parseInt(partsObject.second)
-			);
-		}
+        // Configura la fecha objetivo (2 días a partir de hoy a las 00:00)
+        function getTargetDate() {
+            const now = getEuropeNow();
+            const target = new Date(now);
+            target.setDate(target.getDate() + 2);
+            target.setHours(0, 0, 0, 0);
+            return target;
+        }
 
-		function getEuropeInDays(daysToAdd: number) {
-			const europeNow = getEuropeNow();
-			const europeInDays = new Date(europeNow);
-			europeInDays.setDate(europeInDays.getDate() + daysToAdd);
-			europeInDays.setHours(0, 0, 0, 0);
-			return europeInDays;
-		}
+        let targetDate = getTargetDate();
 
-		const tomorrow = getEuropeInDays(2);
+        function tick() {
+            const now = getEuropeNow();
+            let diff = targetDate.getTime() - now.getTime();
 
-		function tick() {
-			const europNow = getEuropeNow();
-			const timeRemaining = tomorrow.valueOf() - europNow.valueOf();
+            if (diff <= 0) {
+                targetDate = getTargetDate(); // Reinicia el ciclo
+                diff = targetDate.getTime() - now.getTime();
+            }
 
-			if (timeRemaining <= 0) {
-				// Si se acaba el tiempo, reinicia
-				const nextTomorrow = getEuropeInDays(0);
-				tomorrow.setTime(nextTomorrow.getTime());
-				return;
-			}
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
 
-			// Calcular días, horas, minutos y segundos
-			const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-			const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
-			const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
-			const seconds = Math.floor((timeRemaining / 1000) % 60);
+            // Actualizar Números y Variable CSS para la animación de DaisyUI
+            const updateEl = (id: string, val: number) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = String(val).padStart(2, "0");
+                    el.style.setProperty("--value", String(val));
+                }
+            };
 
-			// Actualizar el DOM
-			const daysEl = document.getElementById('days') as HTMLSpanElement | null;
-			const hoursEl = document.getElementById('hours') as HTMLSpanElement | null;
-			const minutesEl = document.getElementById('minutes') as HTMLSpanElement | null;
-			const secondsEl = document.getElementById('seconds') as HTMLSpanElement | null;
+            updateEl("days", d);
+            updateEl("hours", h);
+            updateEl("minutes", m);
+            updateEl("seconds", s);
 
-			const daysLabel = document.getElementById('days-label') as HTMLSpanElement | null;
-			const hoursLabel = document.getElementById('hours-label') as HTMLSpanElement | null;
-			const minutesLabel = document.getElementById('minutes-label') as HTMLSpanElement | null;
-			const secondsLabel = document.getElementById('seconds-label') as HTMLSpanElement | null;
+            // Actualizar Textos (Singular/Plural)
+            const setLabel = (id: string, val: number, sing: string, plur: string) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val === 1 ? sing : plur;
+            };
 
-			if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-			if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-			if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-			if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+            setLabel("days-label", d, "Día", "Días");
+            setLabel("hours-label", h, "Hora", "Horas");
+            setLabel("minutes-label", m, "Minuto", "Minutos");
+            setLabel("seconds-label", s, "Segundo", "Segundos");
+        }
 
-			// Cambiar labels según si es singular o plural
-			if (daysLabel) daysLabel.textContent = days === 1 ? 'Día' : 'Días';
-			if (hoursLabel) hoursLabel.textContent = hours === 1 ? 'Hora' : 'Horas';
-			if (minutesLabel) minutesLabel.textContent = minutes === 1 ? 'Minuto' : 'Minutos';
-			if (secondsLabel) secondsLabel.textContent = seconds === 1 ? 'Segundo' : 'Segundos';
-		}
+        tick();
+        setInterval(tick, 1000);
+    }
 
-		// Actualizar inmediatamente
-		tick();
-
-		// Actualizar cada segundo
-		setInterval(tick, 1000);
-	}
-
-	// Iniciar cuando el DOM esté listo
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', updateCountdown);
-	} else {
-		updateCountdown();
-	}
+    // Ejecución compatible con Astro/SSR
+    updateCountdown();
+    document.addEventListener("astro:after-swap", updateCountdown);
 </script>
-
-<style>
-	#countdown-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		min-height: 100vh;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		font-family: 'Arial', sans-serif;
-	}
-
-	#countdown-display {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 2rem;
-		background: rgba(255, 255, 255, 0.1);
-		padding: 3rem;
-		border-radius: 20px;
-		backdrop-filter: blur(10px);
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-	}
-
-	.time-unit {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.number {
-		font-size: 4rem;
-		font-weight: bold;
-		color: #ffffff;
-		line-height: 1;
-		min-width: 100px;
-		text-align: center;
-		text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-	}
-
-	.label {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.9);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		font-weight: 600;
-	}
-
-	.separator {
-		font-size: 3rem;
-		color: rgba(255, 255, 255, 0.8);
-		font-weight: bold;
-	}
-
-	@media (max-width: 768px) {
-		#countdown-display {
-			flex-direction: column;
-			padding: 2rem;
-			gap: 1rem;
-		}
-
-		.number {
-			font-size: 2.5rem;
-			min-width: 70px;
-		}
-
-		.separator {
-			font-size: 2rem;
-		}
-	}
-</style>
