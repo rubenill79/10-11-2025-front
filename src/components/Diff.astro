@@ -1,0 +1,16 @@
+---
+import { Image } from 'astro:assets';
+
+import Original from "../assets/Original.jpg";
+import AI from "../assets/AI.png";
+---
+
+<figure class="diff aspect-square" tabindex="0">
+  <div class="diff-item-1" role="img" tabindex="0">
+    <Image src={Original} alt="Original"/>
+  </div>
+  <div class="diff-item-2" role="img">
+    <Image src={AI} alt="AI"/>
+  </div>
+  <div class="diff-resizer"></div>
+</figure>

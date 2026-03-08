@@ -3,13 +3,14 @@ import Base from "../layouts/Base.astro";
 import Header from "../components/Header.astro";
 import Sidebar from "../components/Sidebar.astro";
 import Countdown from "../components/Countdown.astro";
+import Diff from "../components/Diff.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 
-import { getLangFromUrl } from '../i18n/utils';
+import { getLangFromUrl } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
-const {title, sideBarActiveItemID} = Astro.props;
+const { title, sideBarActiveItemID } = Astro.props;
 ---
 
 <!doctype html>
@@ -22,9 +23,11 @@ const {title, sideBarActiveItemID} = Astro.props;
 			<input id="my-drawer" type="checkbox" class="drawer-toggle" />
 			<div class="drawer-content flex flex-col">
 				<Header />
-				<Countdown />
 				<div class="md:flex md:justify-center grow">
 					<main class="p-6 pt-10 lg:max-w-225 max-w-[100vw]">
+						<Countdown />
+						<slot />
+						<Diff />
 						<slot />
 					</main>
 				</div>
