@@ -1,27 +1,36 @@
 ---
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Sidebar from "../components/Sidebar.astro";
+import Countdown from "../components/Countdown.astro";
+import Footer from "../components/Footer.astro";
 import "../styles/global.css";
+
+import { getLangFromUrl } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const {title, sideBarActiveItemID} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
 	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Cuenta Atrás 24 Horas</title>
+		<Base title={title} description={"TODO"} />
 	</head>
-	<body>
-		<slot />
+	<body class="flex flex-col min-h-screen">
+		<div class="drawer lg:drawer-open grow">
+			<input id="my-drawer" type="checkbox" class="drawer-toggle" />
+			<div class="drawer-content flex flex-col">
+				<Header />
+				<Countdown />
+				<div class="md:flex md:justify-center grow">
+					<main class="p-6 pt-10 lg:max-w-225 max-w-[100vw]">
+						<slot />
+					</main>
+				</div>
+				<Footer class="mt-auto" />
+			</div>
+			<!--<Sidebar sideBarActiveItemID={sideBarActiveItemID} />-->
+		</div>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
