@@ -7,6 +7,13 @@ export const onRequest = defineMiddleware((context, next) => {
   // Extraer la información de la URL actual
   const url = new URL(context.request.url);
   const pathSegments = url.pathname.split('/').filter(Boolean);
+  const { pathname } = url
+
+  // 1. Filtrar assets y archivos estáticos
+  // Ignoramos si la ruta contiene un punto (ej. .png, .css) o si empieza por /_astro
+  if (pathname.includes('/_image')) {
+    return next();
+  }
   
   // El primer segmento indica el idioma (ej. /es/ o /en/)
   const currentLocale = pathSegments[0];
