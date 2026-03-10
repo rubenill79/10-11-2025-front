@@ -76,13 +76,19 @@
             
             fireworks.start();
             
+            // A los 12 segundos, iniciar la traca final super intensa
+            setTimeout(() => {
+                fireworks.updateOptions({
+                    intensity: 100, // Mucha más intensidad
+                    particles: 100, // Más partículas por explosión
+                });
+            }, 12000); // 12 segundos
+            
             // Duren 20 segundos en total
             setTimeout(() => {
-                // Para que no se corten de repente, bajamos la intensidad a 0
-                // Esto hará que dejen de salir cohetes nuevos pero los que están terminen de explotar
+                // Detenemos nuevos lanzamientos pero mantenemos explosiones para que terminen
                 fireworks.updateOptions({
-                    intensity: 0,
-                    particles: 0
+                    intensity: 0 // Solo detenemos nuevos cohetes, los que están siguen explotando
                 });
 
                 // Esperamos un par de segundos más para que desaparezcan del todo antes de parar el motor
