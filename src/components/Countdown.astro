@@ -1,4 +1,8 @@
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-5 text-center justify-items-center">
+---
+import Card from './Card.astro';
+---
+
+<div id="countdown-container" class="grid grid-cols-2 sm:grid-cols-4 gap-5 text-center justify-items-center">
     <div class="bg-neutral rounded-box text-neutral-content flex flex-col py-6 sm:p-2 w-full max-w-35 sm:max-w-none">
         <span class="countdown font-mono text-5xl flex justify-center">
             <span id="days" style="--value:00; --digits: 2;">00</span>
@@ -28,6 +32,10 @@
     </div>
 </div>
 
+<div id="card-container" style="w-full display: none;">
+    <Card />
+</div>
+
 <script>
     function updateCountdown() {
         const europeFormatter = new Intl.DateTimeFormat("es-ES", {
@@ -51,14 +59,28 @@
         }
 
         let targetDate = getTargetDate();
+        let countdownEnded = false;
 
         function tick() {
             const now = getEuropeNow();
             let diff = targetDate.getTime() - now.getTime();
 
             if (diff <= 0) {
-                // Si ya pasó la fecha, mostrar 0 y detener la actualización
                 diff = 0;
+                countdownEnded = true;
+            }
+            
+            // 3. Grab the elements by ID and cast them as HTMLElements to avoid TS errors
+            const countdownElements = document.getElementById('countdown-container');
+            const cardContainer = document.getElementById('card-container');
+
+            if (countdownEnded) {
+                if (countdownElements) countdownElements.style.display = 'none';
+                if (cardContainer) cardContainer.style.display = 'block'; // Show the card
+                return; // Stop processing numbers if the countdown is over
+            } else {
+                if (countdownElements) countdownElements.style.display = 'grid';
+                if (cardContainer) cardContainer.style.display = 'none';
             }
 
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -66,7 +88,6 @@
             const m = Math.floor((diff / (1000 * 60)) % 60);
             const s = Math.floor((diff / 1000) % 60);
 
-            // Actualizar Números y Variable CSS para la animación de DaisyUI
             const updateEl = (id: string, val: number) => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -79,7 +100,6 @@
             updateEl("minutes", m);
             updateEl("seconds", s);
 
-            // Actualizar Textos (Singular/Plural)
             const setLabel = (id: string, val: number, sing: string, plur: string) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = val === 1 ? sing : plur;
@@ -92,10 +112,14 @@
         }
 
         tick();
-        setInterval(tick, 1000);
+        
+        // 4. Clear the interval when done to save browser resources
+        const intervalId = setInterval(() => {
+            tick();
+            if (countdownEnded) clearInterval(intervalId);
+        }, 1000);
     }
 
-    // Ejecución compatible con Astro/SSR
     updateCountdown();
     document.addEventListener("astro:after-swap", updateCountdown);
 </script>
